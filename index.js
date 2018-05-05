@@ -107,9 +107,9 @@ class JestDiscordReporter {
       },
     };
 
-    if (!webhookUrl)
+    if (!process.env.JEST_DISCORD_WEBHOOK && !webhookUrl)
       throw new Error(
-        'Please add a Discord webhookUrl field under jest-discord-reporter on your package.json'
+        'Please add a Discord webhookUrl as environment variable called JEST_DISCORD_WEBHOOK or as jest-discord-reporter configuration on your package.json '
       );
 
     if (sendOnlyWhenFailed && testFailed) {
