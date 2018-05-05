@@ -1,6 +1,6 @@
 {
   "name": "jest-discord-reporter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Jest reporter used to send test results with Discord.",
   "author": "Jakub Mucha <jakub.mucha@icloud.com>",
   "repository": "git@github.com:drptbl/jest-discord-reporter.git",
