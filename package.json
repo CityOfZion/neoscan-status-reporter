@@ -1,0 +1,33 @@
+{
+  "name": "jest-discord-reporter",
+  "version": "1.0.0",
+  "description": "Jest reporter used to send test results with Discord.",
+  "author": "Jakub Mucha <jakub.mucha@icloud.com>",
+  "repository": "git@github.com:drptbl/jest-discord-reporter.git",
+  "homepage": "https://github.com/drptbl/jest-discord-reporter",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint index.js",
+    "eslint-check": "./node_modules/.bin/eslint --print-config .eslintrc.json | ./node_modules/.bin/eslint-config-prettier-check"
+  },
+  "keywords": [
+    "jest",
+    "discord",
+    "plugin",
+    "test",
+    "results",
+    "reporter",
+    "report"
+  ],
+  "dependencies": {
+    "env-ci": "2.1.0",
+    "request": "2.85.0"
+  },
+  "devDependencies": {
+    "eslint": "4.19.1",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-prettier": "2.6.0",
+    "prettier": "1.12.1"
+  }
+}
