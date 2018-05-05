@@ -3,6 +3,7 @@
 	<p align="center">
     Cutomizable <a href="https://github.com/facebook/jest">Jest</a> reporter with CI integration that sends test results to <a href="https://discordapp.com/">Discord</a> channel via incoming webhook.
 		<br />
+		<br />
 		<img src="https://nodei.co/npm/jest-discord-reporter.png?downloads=true&stars=true" alt="">
 		<br />
 		<br />
