@@ -1,5 +1,17 @@
-# Jest Discord Reporter
-Cutomizable Jest reporter with CI integration that sends test results to Discord channel via incoming webhook.
+<p align="center">
+	<h3 align="center">jest-discord-reporter</h3>
+	<p align="center">
+    Cutomizable <a href="https://github.com/facebook/jest">Jest</a> reporter with CI integration that sends test results to <a href="https://discordapp.com/">Discord</a> channel via incoming webhook.
+		<br />
+		<img src="https://nodei.co/npm/jest-discord-reporter.png?downloads=true&stars=true" alt="">
+		<br />
+		<br />
+		<hr />
+		<img src="https://i.imgur.com/Dn3TAtb.png" alt="">
+	</p>
+</p>
+
+***
 
 ## Set up
 1. Set up a [Discord incoming webhook integration](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
