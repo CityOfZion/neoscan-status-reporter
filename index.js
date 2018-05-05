@@ -16,7 +16,7 @@ class JestDiscordReporter {
   }
 
   onRunComplete(test, results) {
-    const webhookUrl = this._options.webhookUrl;
+    const webhookUrl = process.env.JEST_DISCORD_WEBHOOK || this._options.webhookUrl;
     const sendOnlyWhenFailed = this._options.sendOnlyWhenFailed || false;
     const env = process.env.CI_NETWORK || process.env.NETWORK || '';
     const {
