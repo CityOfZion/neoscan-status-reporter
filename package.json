@@ -1,10 +1,10 @@
 {
-  "name": "jest-discord-reporter",
+  "name": "@cityofzion/neoscan-status-reporter",
   "version": "1.0.5",
-  "description": "Jest reporter used to send test results with Discord.",
-  "author": "Jakub Mucha <jakub.mucha@icloud.com>",
-  "repository": "git@github.com:drptbl/jest-discord-reporter.git",
-  "homepage": "https://github.com/drptbl/jest-discord-reporter",
+  "description": "Jest reporter used by https://github.com/CityOfZion/neo-scan API tests to send test results with Discord.",
+  "author": "Jakub Mucha <jakub.mucha@icloud.com> (https://github.com/drptbl)",
+  "repository": "git@github.com:CityOfZion/neoscan-status-reporter.git",
+  "homepage": "https://github.com/CityOfZion/neoscan-status-reporter#readme",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

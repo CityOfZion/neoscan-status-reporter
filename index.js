@@ -5,18 +5,18 @@ const { branch, job, jobUrl } = envCi();
 
 let textToSend;
 
-class JestDiscordReporter {
+class NeoscanStatusReporter {
   constructor(globalConfig, options) {
     this._globalConfig = globalConfig;
     this._options = options;
   }
 
   onRunStart({ numTotalTestSuites }) {
-    console.log(`[discord-jest-reporter] Found ${numTotalTestSuites} test suites.`);
+    console.log(`[neoscan-status-reporter] Found ${numTotalTestSuites} test suites.`);
   }
 
   onRunComplete(test, results) {
-    const webhookUrl = process.env.JEST_DISCORD_WEBHOOK || this._options.webhookUrl;
+    const webhookUrl = process.env.NEOSCAN_REPORTER_WEBHOOK || this._options.webhookUrl;
     const sendOnlyWhenFailed = this._options.sendOnlyWhenFailed || false;
     const env = process.env.CI_NETWORK || process.env.NETWORK || '';
     const {
@@ -103,13 +103,13 @@ class JestDiscordReporter {
       method: 'POST',
       json: {
         embeds: textToSend,
-        username: this._options.username || 'jest-discord-reporter',
+        username: this._options.username || 'neoscan-status-reporter',
       },
     };
 
-    if (!process.env.JEST_DISCORD_WEBHOOK && !webhookUrl)
+    if (!process.env.NEOSCAN_REPORTER_WEBHOOK && !webhookUrl)
       throw new Error(
-        'Please add a Discord webhookUrl as environment variable called JEST_DISCORD_WEBHOOK or as jest-discord-reporter configuration on your package.json '
+        'Please add a Discord webhookUrl as environment variable called NEOSCAN_REPORTER_WEBHOOK or as neoscan-status-reporter configuration on your package.json '
       );
 
     if (sendOnlyWhenFailed && testFailed) {
@@ -120,4 +120,4 @@ class JestDiscordReporter {
   }
 }
 
-module.exports = JestDiscordReporter;
+module.exports = NeoscanStatusReporter;
