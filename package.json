@@ -12,13 +12,12 @@
     "eslint-check": "./node_modules/.bin/eslint --print-config .eslintrc.json | ./node_modules/.bin/eslint-config-prettier-check"
   },
   "keywords": [
+    "neoscan",
     "jest",
     "discord",
-    "plugin",
     "test",
-    "results",
-    "reporter",
-    "report"
+    "status",
+    "reporter"
   ],
   "dependencies": {
     "env-ci": "2.1.0",
