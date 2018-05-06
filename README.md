@@ -10,11 +10,18 @@
 </p>
 
 <p align="center">
-  Cutomizable <a href="https://github.com/facebook/jest">Jest</a> reporter with CI integration that sends test results to <a href="https://discordapp.com/">Discord</a> channel via incoming webhook. Used by API tests in <a href="https://github.com/CityOfZion/neo-scan">neo-scan</a> repository.
+  Cutomizable <a href="https://github.com/facebook/jest">Jest</a> reporter with CI integration that sends test results to <a href="https://discordapp.com/">Discord</a> channel via incoming webhook.
   <br />
-	<br />
-	<hr />
-	<img src="https://i.imgur.com/Dn3TAtb.png" alt="">
+  Used by API tests in <a href="https://github.com/CityOfZion/neo-scan">neo-scan</a> repository.
+  <br />
+</p>
+
+<hr />
+
+<p align="center">
+  <img 
+    src="https://i.imgur.com/Dn3TAtb.png"
+    alt="Reporter preview">
 </p>
 
 ***
