@@ -75,15 +75,32 @@ class NeoscanStatusReporter {
 
     if (!process.env.NEOSCAN_REPORTER_WEBHOOK && !webhookUrl)
       throw new Error(
-        'Please add a Discord webhookUrl as environment variable called NEOSCAN_REPORTER_WEBHOOK or as neoscan-status-reporter configuration on your package.json '
+        '[neoscan-status-reporter] Please add a Discord webhookUrl as environment variable called NEOSCAN_REPORTER_WEBHOOK or as neoscan-status-reporter configuration on your package.json '
       );
 
     if (process.env.SEND_DETAILS) {
-      axios(options);
+      options.data.content = `<@${process.env.TRIGGERED_BY}> - here are your results:`;
+      axios(options)
+        .then(() => {
+          console.log('[neoscan-status-reporter] Results sent with success.');
+        })
+        .catch(err => {
+          console.log(
+            `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
+          );
+        });
     } else if (sendOnlyWhenFailed && testFailed) {
-      axios(options);
+      axios(options).catch(err => {
+        console.log(
+          `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
+        );
+      });
     } else if (!sendOnlyWhenFailed) {
-      axios(options);
+      axios(options).catch(err => {
+        console.log(
+          `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
+        );
+      });
     }
   }
 }
