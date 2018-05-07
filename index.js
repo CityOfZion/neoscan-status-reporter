@@ -25,6 +25,7 @@ class NeoscanStatusReporter {
       numPassedTests,
       numTotalTests,
       startTime,
+      testResults,
     } = results;
     const testFailed = numFailedTests || numFailedTestSuites;
     const end = new Date();
@@ -80,9 +81,83 @@ class NeoscanStatusReporter {
 
     if (process.env.SEND_DETAILS) {
       options.data.content = `<@${process.env.TRIGGERED_BY}> - here are your results:`;
+
       axios(options)
         .then(() => {
           console.log('[neoscan-status-reporter] Results sent with success.');
+
+          options.data.embeds = [];
+          options.data.content = '';
+
+          if (testFailed) {
+            options.data.content += '**FAILED TESTS:**\n```js\n';
+            testResults.forEach(suiteResult => {
+              suiteResult.testResults.forEach(testResult => {
+                if (testResult.status === 'failed') {
+                  options.data.content += `${testResult.ancestorTitles} (${
+                    testResult.duration
+                  }ms)\n`;
+                }
+              });
+            });
+            options.data.content += '```';
+
+            axios(options)
+              .then(() => {
+                console.log('[neoscan-status-reporter] Failed tests sent with success.');
+
+                options.data.content = '';
+
+                options.data.content += '**PASSED TESTS:**\n```js\n';
+                testResults.forEach(suiteResult => {
+                  suiteResult.testResults.forEach(testResult => {
+                    if (testResult.status === 'passed') {
+                      options.data.content += `${testResult.ancestorTitles} (${
+                        testResult.duration
+                      }ms)\n`;
+                    }
+                  });
+                });
+                options.data.content += '```';
+
+                axios(options)
+                  .then(() => {
+                    console.log('[neoscan-status-reporter] Passed tests sent with success.');
+                  })
+                  .catch(err => {
+                    console.log(
+                      `[neoscan-status-reporter] There was an error while trying to send passed tests to the webhook:\n${err}`
+                    );
+                  });
+              })
+              .catch(err => {
+                console.log(
+                  `[neoscan-status-reporter] There was an error while trying to send failed tests to the webhook:\n${err}`
+                );
+              });
+          } else {
+            options.data.content += '**PASSED TESTS:**\n```js\n';
+            testResults.forEach(suiteResult => {
+              suiteResult.testResults.forEach(testResult => {
+                if (testResult.status === 'passed') {
+                  options.data.content += `${testResult.ancestorTitles} (${
+                    testResult.duration
+                  }ms)\n`;
+                }
+              });
+            });
+            options.data.content += '```';
+
+            axios(options)
+              .then(() => {
+                console.log('[neoscan-status-reporter] Passed tests sent with success.');
+              })
+              .catch(err => {
+                console.log(
+                  `[neoscan-status-reporter] There was an error while trying to send passed tests to the webhook:\n${err}`
+                );
+              });
+          }
         })
         .catch(err => {
           console.log(
