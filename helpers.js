@@ -22,6 +22,34 @@ const helpers = {
   duration: (end, start) => {
     return helpers.formatTime(end - start);
   },
+  setFailedTests: (options, testResults) => {
+    options.data.embeds = [];
+    options.data.content = '';
+    options.data.content += '**FAILED TESTS:**\n```js\n';
+    testResults.forEach(suiteResult => {
+      suiteResult.testResults.forEach(testResult => {
+        if (testResult.status === 'failed') {
+          options.data.content += `${testResult.ancestorTitles} (${testResult.duration}ms)\n`;
+        }
+      });
+    });
+    options.data.content += '```';
+    return options.data.content;
+  },
+  setPassedTests: (options, testResults) => {
+    options.data.embeds = [];
+    options.data.content = '';
+    options.data.content += '**PASSED TESTS:**\n```js\n';
+    testResults.forEach(suiteResult => {
+      suiteResult.testResults.forEach(testResult => {
+        if (testResult.status === 'passed') {
+          options.data.content += `${testResult.ancestorTitles} (${testResult.duration}ms)\n`;
+        }
+      });
+    });
+    options.data.content += '```';
+    return options.data.content;
+  },
 };
 
 module.exports = helpers;
