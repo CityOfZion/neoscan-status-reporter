@@ -1,6 +1,6 @@
-const { duration } = require('./lib/utils');
 const axios = require('axios');
 const envCi = require('env-ci');
+const { duration, setFailedTests, setPassedTests } = require('./helpers');
 const { branch, job, jobUrl } = envCi();
 
 class NeoscanStatusReporter {
@@ -86,39 +86,14 @@ class NeoscanStatusReporter {
         .then(() => {
           console.log('[neoscan-status-reporter] Results sent with success.');
 
-          options.data.embeds = [];
-          options.data.content = '';
-
           if (testFailed) {
-            options.data.content += '**FAILED TESTS:**\n```js\n';
-            testResults.forEach(suiteResult => {
-              suiteResult.testResults.forEach(testResult => {
-                if (testResult.status === 'failed') {
-                  options.data.content += `${testResult.ancestorTitles} (${
-                    testResult.duration
-                  }ms)\n`;
-                }
-              });
-            });
-            options.data.content += '```';
+            setFailedTests(options, testResults);
 
             axios(options)
               .then(() => {
                 console.log('[neoscan-status-reporter] Failed tests sent with success.');
 
-                options.data.content = '';
-
-                options.data.content += '**PASSED TESTS:**\n```js\n';
-                testResults.forEach(suiteResult => {
-                  suiteResult.testResults.forEach(testResult => {
-                    if (testResult.status === 'passed') {
-                      options.data.content += `${testResult.ancestorTitles} (${
-                        testResult.duration
-                      }ms)\n`;
-                    }
-                  });
-                });
-                options.data.content += '```';
+                setPassedTests(options, testResults);
 
                 axios(options)
                   .then(() => {
@@ -136,17 +111,7 @@ class NeoscanStatusReporter {
                 );
               });
           } else {
-            options.data.content += '**PASSED TESTS:**\n```js\n';
-            testResults.forEach(suiteResult => {
-              suiteResult.testResults.forEach(testResult => {
-                if (testResult.status === 'passed') {
-                  options.data.content += `${testResult.ancestorTitles} (${
-                    testResult.duration
-                  }ms)\n`;
-                }
-              });
-            });
-            options.data.content += '```';
+            setPassedTests(options, testResults);
 
             axios(options)
               .then(() => {
@@ -165,11 +130,25 @@ class NeoscanStatusReporter {
           );
         });
     } else if (sendOnlyWhenFailed && testFailed) {
-      axios(options).catch(err => {
-        console.log(
-          `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
-        );
-      });
+      axios(options)
+        .then(() => {
+          setFailedTests(options, testResults);
+
+          axios(options)
+            .then(() => {
+              console.log('[neoscan-status-reporter] Failed tests sent with success.');
+            })
+            .catch(err => {
+              console.log(
+                `[neoscan-status-reporter] There was an error while trying to send failed tests to the webhook:\n${err}`
+              );
+            });
+        })
+        .catch(err => {
+          console.log(
+            `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
+          );
+        });
     } else if (!sendOnlyWhenFailed) {
       axios(options).catch(err => {
         console.log(
