@@ -1,5 +1,5 @@
 const { duration } = require('./lib/utils');
-const request = require('request');
+const axios = require('axios');
 const envCi = require('env-ci');
 const { branch, job, jobUrl } = envCi();
 
@@ -65,9 +65,9 @@ class NeoscanStatusReporter {
     }
 
     const options = {
-      uri: webhookUrl,
-      method: 'POST',
-      json: {
+      url: webhookUrl,
+      method: 'post',
+      data: {
         embeds: textToSend,
         username: this._options.username || 'neoscan-status-reporter',
       },
@@ -79,11 +79,11 @@ class NeoscanStatusReporter {
       );
 
     if (process.env.SEND_DETAILS) {
-      request(options);
+      axios(options);
     } else if (sendOnlyWhenFailed && testFailed) {
-      request(options);
+      axios(options);
     } else if (!sendOnlyWhenFailed) {
-      request(options);
+      axios(options);
     }
   }
 }
