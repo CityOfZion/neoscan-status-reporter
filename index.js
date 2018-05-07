@@ -92,7 +92,11 @@ class NeoscanStatusReporter {
       },
     ];
 
-    if (testFailed) {
+    if (process.env.SEND_DETAILS && testFailed) {
+      textToSend = failureText;
+    } else if (process.env.SEND_DETAILS) {
+      textToSend = successText;
+    } else if (testFailed) {
       textToSend = failureText;
     } else {
       textToSend = successText;
@@ -112,7 +116,9 @@ class NeoscanStatusReporter {
         'Please add a Discord webhookUrl as environment variable called NEOSCAN_REPORTER_WEBHOOK or as neoscan-status-reporter configuration on your package.json '
       );
 
-    if (sendOnlyWhenFailed && testFailed) {
+    if (process.env.SEND_DETAILS) {
+      request(options);
+    } else if (sendOnlyWhenFailed && testFailed) {
       request(options);
     } else if (!sendOnlyWhenFailed) {
       request(options);
