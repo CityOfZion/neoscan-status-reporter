@@ -3,8 +3,6 @@ const request = require('request');
 const envCi = require('env-ci');
 const { branch, job, jobUrl } = envCi();
 
-let textToSend;
-
 class NeoscanStatusReporter {
   constructor(globalConfig, options) {
     this._globalConfig = globalConfig;
@@ -32,13 +30,9 @@ class NeoscanStatusReporter {
     const end = new Date();
     const start = new Date(startTime);
 
-    const successText = [
+    let textToSend = [
       {
-        description: `Build [#${job}](${jobUrl}) passed on ${branch} branch.`,
-        color: 8781568,
-        thumbnail: {
-          url: 'https://i.imgur.com/KZMxbBe.png',
-        },
+        thumbnail: {},
         fields: [
           {
             name: 'Environment',
@@ -60,46 +54,14 @@ class NeoscanStatusReporter {
       },
     ];
 
-    const failureText = [
-      {
-        description: `Build [#${job}](${jobUrl}) failed on ${branch} branch.`,
-        color: 16711712,
-        thumbnail: {
-          url: 'https://i.imgur.com/8F9zGmh.png',
-        },
-        fields: [
-          {
-            name: 'Environment',
-            value: env,
-            inline: true,
-          },
-          {
-            name: 'Duration',
-            value: duration(end, start),
-            inline: true,
-          },
-          {
-            name: 'Suites',
-            value: `Passed: ${numPassedTestSuites}, Failed: ${numFailedTestSuites}, Total: ${numTotalTestSuites}`,
-            inline: true,
-          },
-          {
-            name: 'Tests',
-            value: `Passed: ${numPassedTests}, Failed: ${numFailedTests}, Total: ${numTotalTests}`,
-            inline: true,
-          },
-        ],
-      },
-    ];
-
-    if (process.env.SEND_DETAILS && testFailed) {
-      textToSend = failureText;
-    } else if (process.env.SEND_DETAILS) {
-      textToSend = successText;
-    } else if (testFailed) {
-      textToSend = failureText;
+    if (testFailed) {
+      textToSend[0].description = `Build [#${job}](${jobUrl}) failed on ${branch} branch.`;
+      textToSend[0].thumbnail.url = 'https://i.imgur.com/8F9zGmh.png';
+      textToSend[0].color = 16711712;
     } else {
-      textToSend = successText;
+      textToSend[0].description = `Build [#${job}](${jobUrl}) passed on ${branch} branch.`;
+      textToSend[0].thumbnail.url = 'https://i.imgur.com/KZMxbBe.png';
+      textToSend[0].color = 8781568;
     }
 
     const options = {
