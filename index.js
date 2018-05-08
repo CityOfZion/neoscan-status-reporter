@@ -1,7 +1,10 @@
 const axios = require('axios');
 const envCi = require('env-ci');
-const { duration, setFailedTests, setPassedTests } = require('./helpers');
+const jsonfile = require('jsonfile');
+const path = require('path');
+const { duration, setFailedTests, setPassedTests, writeJson } = require('./helpers');
 const { branch, job, jobUrl } = envCi();
+const testStatusPath = path.join(process.cwd(), '/results/testStatus.json');
 
 class NeoscanStatusReporter {
   constructor(globalConfig, options) {
@@ -11,9 +14,29 @@ class NeoscanStatusReporter {
 
   onRunStart({ numTotalTestSuites }) {
     console.log(`[neoscan-status-reporter] Found ${numTotalTestSuites} test suites.`);
+    const initialData = { testsFailedNow: false, testsFailedBefore: false };
+
+    jsonfile.readFile(testStatusPath, (err, data) => {
+      if (err) {
+        console.log(`[neoscan-status-reporter] testStatus.json file not found, creating..`);
+        writeJson(testStatusPath, initialData);
+      } else {
+        if (data.testsFailedNow) {
+          data.testsFailedBefore = true;
+          data.testsFailedNow = false;
+        }
+        writeJson(testStatusPath, data);
+        console.log(
+          `[neoscan-status-reporter] testStatus.json file found: ${JSON.stringify(data)}`
+        );
+      }
+    });
   }
 
   onRunComplete(test, results) {
+    let shouldSend = false;
+
+    const testStatus = require(testStatusPath);
     const webhookUrl = process.env.NEOSCAN_REPORTER_WEBHOOK || this._options.webhookUrl;
     const sendOnlyWhenFailed = this._options.sendOnlyWhenFailed || false;
     const env = process.env.CI_NETWORK || process.env.NETWORK || '';
@@ -59,10 +82,22 @@ class NeoscanStatusReporter {
       textToSend[0].description = `Build [#${job}](${jobUrl}) failed on ${branch} branch.`;
       textToSend[0].thumbnail.url = 'https://i.imgur.com/8F9zGmh.png';
       textToSend[0].color = 16711712;
+
+      testStatus.testsFailedNow = true;
+      if (!testStatus.testsFailedBefore) {
+        shouldSend = true;
+      }
+      writeJson(testStatusPath, testStatus);
     } else {
       textToSend[0].description = `Build [#${job}](${jobUrl}) passed on ${branch} branch.`;
       textToSend[0].thumbnail.url = 'https://i.imgur.com/KZMxbBe.png';
       textToSend[0].color = 8781568;
+
+      if (testStatus.testsFailedBefore) {
+        shouldSend = true;
+        testStatus.testsFailedBefore = false;
+      }
+      writeJson(testStatusPath, testStatus);
     }
 
     const options = {
@@ -129,7 +164,7 @@ class NeoscanStatusReporter {
             `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
           );
         });
-    } else if (sendOnlyWhenFailed && testFailed) {
+    } else if (sendOnlyWhenFailed && testFailed && shouldSend) {
       axios(options)
         .then(() => {
           setFailedTests(options, testResults);
@@ -149,6 +184,12 @@ class NeoscanStatusReporter {
             `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
           );
         });
+    } else if (sendOnlyWhenFailed && shouldSend) {
+      axios(options).catch(err => {
+        console.log(
+          `[neoscan-status-reporter] There was an error while trying to send results to the webhook:\n${err}`
+        );
+      });
     } else if (!sendOnlyWhenFailed) {
       axios(options).catch(err => {
         console.log(
