@@ -15,22 +15,23 @@ class NeoscanStatusReporter {
   onRunStart({ numTotalTestSuites }) {
     console.log(`[neoscan-status-reporter] Found ${numTotalTestSuites} test suites.`);
     const initialData = { testsFailedNow: false, testsFailedBefore: false };
-
-    jsonfile.readFile(testStatusPath, (err, data) => {
-      if (err) {
-        console.log(`[neoscan-status-reporter] testStatus.json file not found, creating..`);
-        writeJson(testStatusPath, initialData);
-      } else {
-        if (data.testsFailedNow) {
-          data.testsFailedBefore = true;
-          data.testsFailedNow = false;
+    if (!process.env.SEND_DETAILS) {
+      jsonfile.readFile(testStatusPath, (err, data) => {
+        if (err) {
+          console.log(`[neoscan-status-reporter] testStatus.json file not found, creating..`);
+          writeJson(testStatusPath, initialData);
+        } else {
+          if (data.testsFailedNow) {
+            data.testsFailedBefore = true;
+            data.testsFailedNow = false;
+          }
+          writeJson(testStatusPath, data);
+          console.log(
+            `[neoscan-status-reporter] testStatus.json file found: ${JSON.stringify(data)}`
+          );
         }
-        writeJson(testStatusPath, data);
-        console.log(
-          `[neoscan-status-reporter] testStatus.json file found: ${JSON.stringify(data)}`
-        );
-      }
-    });
+      });
+    }
   }
 
   onRunComplete(test, results) {
@@ -83,21 +84,25 @@ class NeoscanStatusReporter {
       textToSend[0].thumbnail.url = 'https://i.imgur.com/8F9zGmh.png';
       textToSend[0].color = 16711712;
 
-      testStatus.testsFailedNow = true;
-      if (!testStatus.testsFailedBefore) {
-        shouldSend = true;
+      if (!process.env.SEND_DETAILS) {
+        testStatus.testsFailedNow = true;
+        if (!testStatus.testsFailedBefore) {
+          shouldSend = true;
+        }
+        writeJson(testStatusPath, testStatus);
       }
-      writeJson(testStatusPath, testStatus);
     } else {
       textToSend[0].description = `Build [#${job}](${jobUrl}) passed on ${branch} branch.`;
       textToSend[0].thumbnail.url = 'https://i.imgur.com/KZMxbBe.png';
       textToSend[0].color = 8781568;
 
-      if (testStatus.testsFailedBefore) {
-        shouldSend = true;
-        testStatus.testsFailedBefore = false;
+      if (!process.env.SEND_DETAILS) {
+        if (testStatus.testsFailedBefore) {
+          shouldSend = true;
+          testStatus.testsFailedBefore = false;
+        }
+        writeJson(testStatusPath, testStatus);
       }
-      writeJson(testStatusPath, testStatus);
     }
 
     const options = {
