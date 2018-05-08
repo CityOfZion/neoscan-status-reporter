@@ -1,3 +1,5 @@
+const jsonfile = require('jsonfile');
+
 const s = 1000;
 const m = s * 60;
 const h = m * 60;
@@ -49,6 +51,15 @@ const helpers = {
     });
     options.data.content += '```';
     return options.data.content;
+  },
+  writeJson: (jsonPath, data) => {
+    jsonfile.writeFile(jsonPath, data, err => {
+      if (err) {
+        console.error(
+          `[neoscan-status-reporter] There was an error while creating/updating testStatus.json file: ${err}`
+        );
+      }
+    });
   },
 };
 
