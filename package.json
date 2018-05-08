@@ -1,6 +1,6 @@
 {
   "name": "@cityofzion/neoscan-status-reporter",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Jest reporter used by https://github.com/CityOfZion/neo-scan API tests to send test results with Discord.",
   "author": "Jakub Mucha <jakub.mucha@icloud.com> (https://github.com/drptbl)",
   "repository": "git@github.com:CityOfZion/neoscan-status-reporter.git",
